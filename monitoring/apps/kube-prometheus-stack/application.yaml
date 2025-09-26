@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd                # Argo CD's namespace (Application CRD lives here)
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring         # where prometheus/grafana will be installed
+  # Use multiple sources:
+  sources:
+    # 1) Helm chart from remote chart repo
+    - repoURL: "https://prometheus-community.github.io/helm-charts"
+      chart: kube-prometheus-stack
+      targetRevision: ""77.11.0""   # e.g. "77.11.0" or "65.1.1"
+      helm:
+        valueFiles:
+          - $values/monitoring-values.yaml   # $values maps to the values repo below
+    # 2) Git repo that contains our value file
+    - repoURL: "https://github.com/YOURORG/monitoring-argo.git"
+      targetRevision: main    # branch/tag/commit in the values repo
+      ref: values             # maps to $values in the helm valueFiles paths
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

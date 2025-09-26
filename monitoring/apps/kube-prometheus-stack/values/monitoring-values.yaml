@@ -1,0 +1,29 @@
+# apps/kube-prometheus-stack/values/monitoring-values.yaml
+grafana:
+  enabled: true
+  # Option A: reference an existing k8s Secret (recommended)
+  admin:
+    existingSecret: monitoring-grafana
+    userKey: admin
+    passwordKey: Samsung135!!
+
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: gp2   # <- change to your storage class
+
+  service:
+    type: ClusterIP
+
+prometheus:
+  prometheusSpec:
+    # Prometheus TSDB storage (Prometheus Operator storageSpec)
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2    # <- change
+          resources:
+            requests:
+              storage: 50Gi
+
+# (other overrides: alertmanager, node-exporter, rbac, ingress, etc)
