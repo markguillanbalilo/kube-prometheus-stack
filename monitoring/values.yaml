@@ -1,0 +1,33 @@
+# Values that control each dependency (subchart key = chart name)
+
+grafana:
+  enabled: true
+  adminUser: admin
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: gp2   
+  service:
+    type: LoadBalancer         # or LoadBalancer if you want external access
+
+prometheus:
+  server:
+    persistentVolume:
+      size: 50Gi
+      storageClass: gp2
+    retention: 15d
+  alertmanager:
+    enabled: true
+    config:
+      # example: put your alertmanager config here or load from Secret
+      # See chart docs for exact structure
+      global: {}
+      route: {}
+
+prometheus-node-exporter:
+  enabled: true
+  service:
+    type: ClusterIP
+
+kube-state-metrics:
+  enabled: true
